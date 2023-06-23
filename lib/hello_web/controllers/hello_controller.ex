@@ -1,6 +1,8 @@
 defmodule HelloWeb.HelloController do
   use HelloWeb, :controller
 
+  plug HelloWeb.Plugs.Locale, "hoge" when action in [:index]
+
   def index(conn, _params) do
     render(conn, :index)
   end
