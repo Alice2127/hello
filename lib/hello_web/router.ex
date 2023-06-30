@@ -21,12 +21,34 @@ defmodule HelloWeb.Router do
     get "/", PageController, :home
     get "/hello", HelloController, :index
     get "/hello/:messenger", HelloController, :show
+    resources "/users", UserController do
+      resources "/posts", PostController #アプリケーション名が異なればscope内では同じrouteを定義しても衝突しない
+    end
+    resources "/reviews", ReviewController
+  end
+
+  scope "/", AnotherAppWeb do
+    pipe_through :browser
+
+    resources "/users", UserController #アプリケーション名が異なればscope内では同じrouteを定義しても衝突しない
+  end
+
+  scope "/admin", HelloWeb.Admin do
+    pipe_through :browser
+
+    resources "/reviews", ReviewController
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", HelloWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", HelloWeb.Api, as: :api do
+    pipe_through :api
+
+    scope "/v1", V1, as: :v1 do
+      resources "/images",  ImageController
+      resources "/reviews", ReviewController
+      resources "/users",   UserController
+    end
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:hello, :dev_routes) do
