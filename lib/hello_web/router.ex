@@ -15,13 +15,19 @@ defmodule HelloWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", HelloWeb do
+  scope "/admin", HelloWeb do #認証を通じて認可の範囲を分けたい場合（管理者）
+    pipe_through :browser
+
+    get "/hello", HelloController, :index
+  end
+
+  scope "/", HelloWeb do #認証を通じて認可の範囲を分けたい場合（非管理者）
     pipe_through :browser
 
     get "/", PageController, :home
     get "/hello", HelloController, :index
     get "/hello/:messenger", HelloController, :show
-    resources "/users", UserController do
+    resources "/users", UserController do #1人のuserが複数のpostsを投稿できるルーティングにしたい場合ネストさせる
       resources "/posts", PostController #アプリケーション名が異なればscope内では同じrouteを定義しても衝突しない
     end
     resources "/reviews", ReviewController
